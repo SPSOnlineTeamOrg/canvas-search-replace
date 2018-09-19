@@ -118,13 +118,12 @@ const canvas = module.exports = (() => {
         .entries(search)
         .map(([key, s]) => [key, s.search(query, option)])
         .map(([key, r]) =>
-          r.map(m => result.push({key, object, m})))
-
-      for (const m of result)
-        m.text = `${m.before}${m.text}${m.after}`,
-        m.type = m.object.loadertype,
-        m.id = m.object.id
-
+          r.map(m => result.push({
+            key, object, m,
+            text : `${m.before}${m.text}${m.after}`,
+            type : object.loadertype,
+            id   : object.id
+          })))
       return result
     }
 
