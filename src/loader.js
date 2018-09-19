@@ -47,9 +47,16 @@ const load = module.exports = (() => {
           callback(r, r)
       }
       const options = { method, url, body, headers }
-      return popsicle
+      let promise = () => popsicle
         .request(options)
         .then(call)
+        .catch(r => {
+          console.log("error", r)
+          console.log("retrying")
+          promise()
+        })
+
+      return promise()
     }
 
     putcontent(link, metadata, callback = r=>r) {
