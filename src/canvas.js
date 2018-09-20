@@ -295,12 +295,12 @@ const canvas = module.exports = (() => {
       function fromresponse(response, loader) {
 
         const prototypes = (type, response, loader) => new ({
-          'object': CanvasObject,
-          'pages': CanvasPage,
-          'quizzes': CanvasQuiz,
-          'assignments': CanvasAssignment,
-          'announcements': CanvasAnnouncement,
-          'discussion_topics': CanvasDiscussion,
+          'object'            : CanvasObject,
+          'pages'             : CanvasPage,
+          'quizzes'           : CanvasQuiz,
+          'assignments'       : CanvasAssignment,
+          'announcements'     : CanvasAnnouncement,
+          'discussion_topics' : CanvasDiscussion,
         }[type])(response, loader)
 
 
@@ -309,7 +309,6 @@ const canvas = module.exports = (() => {
       }
 
       function main(self, callback) {
-
         const course = self.course
         const setval = loader => (r, e) => {
           if (e)

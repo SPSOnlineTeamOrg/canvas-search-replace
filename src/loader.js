@@ -28,34 +28,34 @@ const load = module.exports = (() => {
     // load a given link, replacing the base with the local
     // and adding predefined headers
     loadxhr(method, link, {data, param, head}, callback) {
-      // these two lines keep track of the number of objects
-      // that are still being waited on
       const body = data
       const params  = Object.assign({}, this.param, param)
       const headers = Object.assign({}, this.head, head)
-      const preurl = link.includes(endpoint)
+      const preurl  = link.includes(endpoint)
         ? link.replace(endpoint, local)
         : link.replace(baselink, local)
-      const url = util.addparams(preurl, params)
+      const url     = util.addparams(preurl, params)
+      const options = { method, url, body, headers }
+
+      // these two lines keep track of the number of objects
+      // that are still being waited on
       this.wait.add(url)
       const call = (r, e) => {
+        this.wait.remove(url)
         if (r.status === 200)
-          this.wait.remove(url),
           callback(r, e)
         else
-          console.log("Error", r),
+          console.log("Error", r.status, r.body),
           callback(r, r)
-      }
-      const options = { method, url, body, headers }
+      }   
       let promise = () => popsicle
         .request(options)
         .then(call)
         .catch(r => {
-          console.log("error", r)
-          console.log("retrying")
+          console.log("error:", r.message),
+          console.log("retrying automatically")
           promise()
         })
-
       return promise()
     }
 
@@ -77,15 +77,14 @@ const load = module.exports = (() => {
     loadall(method, link, metadata, callback) {
       const self = this
       const recursive_call = (r, e) => {
-        const resp = JSON.parse(r.body)
-        if (e || resp.errors)
+        let resp = null
+        if (e || (resp = JSON.parse(r.body)).errors)
           return callback(resp, e)
         resp.forEach(r => callback(r))
         const next = util.getnext(r)
         if (next)
           self.loadxhr(method, next, metadata, recursive_call)
       }
-
       return self.loadxhr(method, link, metadata, recursive_call)
     }
 
@@ -163,7 +162,7 @@ const load = module.exports = (() => {
       const self = this
       return super.getcourse(course, {}, (response, error) => {
         if (error)
-          callback(response, error)
+          return callback(response, error)
         self.getlink(response.html_url, metadata, callback)
       })
     }
@@ -184,7 +183,8 @@ const load = module.exports = (() => {
     listcourse(callback, metadata) {
       const link = this.to_url(["courses"])
       return this.getlink(link, metadata, (r, e) => 
-        e ? callback(undefined, e) : r.forEach(r => callback(r)))
+        e ? callback(undefined, e) 
+          : r.forEach(r => callback(r)))
     }
   }
 

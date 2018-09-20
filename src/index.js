@@ -87,7 +87,7 @@ class View {
 
     course.check((r, e) => {
       if (e)
-        return window.alert(`Error - ${e.statusText}`)
+        return window.alert(`Error: ${e.statusText}`)
       this.items = []
       this.vue.items = [],
       this.course_info = r,
