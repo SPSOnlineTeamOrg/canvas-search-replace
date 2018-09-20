@@ -55,7 +55,6 @@ class Manager {
 
     let pattern = `(${g(this.courseid.toString())})`
     let matches = await this.search(pattern)
-    // console.log(matches)
     return Object
       .values(matches)
       .map(i => ({
@@ -67,8 +66,16 @@ class Manager {
 
 }
 
-api = "1116~Br8VsIcG74XaZBnueQwDTNUykG75tLnZmrtLgntLfcEWSZPT2lCxEhvGosmB9RsJ"
+api = "<add apikey here>"
 let m = new Manager(api, "1073295")
 
-m.find_bad_links().then(i => console.log(i))
+m.find_bad_links()
+ .then(r => {
+  r.map(i => {
+    console.log("-----------------")
+    console.log("link  :", i.link)
+    console.log("title :", i.title)
+    console.log("match :", i.match)
+  })
+ })
 
