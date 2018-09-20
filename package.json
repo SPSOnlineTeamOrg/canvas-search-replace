@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babel": "^6.23.0",
     "popsicle": "^9.2.0",
     "popsicle-server": "^2.0.0",
     "raw-loader": "^0.5.1",
