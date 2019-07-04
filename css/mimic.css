@@ -15469,34 +15469,6 @@ body.primary-nav-expanded .ReactTray__Content {
     }
 }
 
-@font-face {
-    font-family: 'LatoWeb';
-    src: url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Regular-3cd3657802.woff2") format("woff2"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Regular-586ec8dc57.woff") format("woff"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Regular-c305a828ef.ttf") format("truetype");
-    font-style: normal;
-    font-weight: normal
-}
-
-@font-face {
-    font-family: 'LatoWeb';
-    src: url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Italic-5e75c67839.woff2") format("woff2"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Italic-6b654922e0.woff") format("woff"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Italic-d9129929b0.ttf") format("truetype");
-    font-style: italic;
-    font-weight: normal
-}
-
-@font-face {
-    font-family: 'LatoWeb';
-    src: url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Bold-3ff66ada9b.woff2") format("woff2"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Bold-f323edeea9.woff") format("woff"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Bold-20ee9bd189.ttf") format("truetype");
-    font-style: normal;
-    font-weight: bold
-}
-
-@font-face {
-    font-family: 'LatoWeb';
-    src: url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Light-c425d3f33c.woff2") format("woff2"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Light-4725b48f89.woff") format("woff"), url("https://canvas.brown.edu/dist/fonts/lato/latin/LatoLatin-Light-f7b5d804f7.ttf") format("truetype");
-    font-style: normal;
-    font-weight: 300
-}
-
 html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
