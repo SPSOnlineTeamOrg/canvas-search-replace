@@ -1118,13 +1118,13 @@ class View {
   loadid() {
     const call = (r, e) => e
       ? window.alert(`Error: ${e.statusText}`)
-      :(this.items.push(r), 
+      :(this.items.push(r),
         this.update())
     this.load(this.vue.course, call)
   }
 
   sort(key) {
-    
+
     if (this.sortkey == key)
       this.ascending = !this.ascending
     else
@@ -12391,6 +12391,7 @@ const canvas = module.exports = (() => {
     }
 
     text() {
+			console.log("text = " + this)
       return this
         .matchable()
         .map(key => `--[${this.searcher[key].text()}]--`)
@@ -12430,6 +12431,12 @@ const canvas = module.exports = (() => {
       return retval
     }
 
+		/**
+	 	 * query: String - the query
+		 * option:
+		 * ashtml: Boolean -
+		 * result:
+	   */
     search(query, option, ashtml=false, result=[]) {
       const object = this
       const search = object.searcher = {}
@@ -12910,7 +12917,7 @@ const load = module.exports = (() => {
 
     listcourse(callback, metadata) {
       const link = this.to_url(["courses"])
-      return this.getlink(link, metadata, (r, e) => 
+      return this.getlink(link, metadata, (r, e) =>
         e ? callback(undefined, e) : r.forEach(r => callback(r)))
     }
   }
@@ -14964,20 +14971,7 @@ const Search = module.exports = (() => {
   // largest power of two greater than or equal to x
   const ceillog = x => Math.ceil(Math.log2(x))
 
-  function assert_str_eq() {
-
-  }
-
-
   function onespace(s) {
-    while (s.includes("  "))
-      s = s.replace(/  /g, " ")
-
-    while (s.includes("\n "))
-      s = s.replace(/\n /g, "\n")
-
-    while (s.includes(" \n"))
-      s = s.replace(/ \n/g, "\n")
 
     return s
   }
@@ -14988,33 +14982,32 @@ const Search = module.exports = (() => {
     // binary tree stores the length of the text stored in the tree
     heapify() {
       const size = this.size = 2**ceillog(this.items.length)
-      const heap = this.heap = Array(size<<1 + 1).fill(0)
+
+		  const heap = this.heap = Array(size<<1 + 1).fill(0)
       this.items.forEach((s, i) =>
         heap[i+size] = !s.attr * s.text.length)
       for (let i = size - 1; i >= 0; --i)
         heap[i] = heap[l(i)] + heap[r(i)]
-
     }
 
     constructor(html, ashtml=false) {
-      const match = /(<[\S|\s]*?>)/g
+      const match = /(<[\S|\s]*?>)/g        // matches any HTML tags
       this.raw = html
       this.items = ashtml
         ? html
           .split(match)
-          .map(s => s.trim())
+				  .map(s=> s)//s.trim())              // I think this was the main cause of the bug??
           .filter(s => s.trim() !== '')
-          .map(s => ({ "attr": /^<[\S|\s]*?>$/g.test(s), "text":s+" " }))
-        : [{ "attr": false, "text":html }]
+          .map(s => ({ "attr": /^<[\S|\s]*?>$/g.test(s), "text":s }))
+        : [{ "attr": false, "text": html }]
       if (!ashtml)
-        this.items.forEach(d => 
-          d.attr ? null : d.text = onespace(d.text+" "))
+        this.items.forEach(d =>
+          d.attr ? null : d.text = onespace(d.text))
       this.heapify()
     }
 
     // update the tree to preserve the property
     update(i) {
-
       const heap = this.heap
       this.asserttext(i)
       heap[i+this.size] = this.items[i].text.length
@@ -15046,20 +15039,25 @@ const Search = module.exports = (() => {
       return ind
     }
 
+		// putting all the text together with no spaces??
     text() {
       return this.items
         .filter(s => !s.attr)
         .map(s => s.text)
         .join("")
-        .trim()
     }
 
     html() {
+			// every item in this.items is  {attr: true/false, text: ".."}
+			// All of the text is trimmed which is the problem.
       return this.items
-        .map(s => s.text.trim())
+        .map(s => s.text)
         .join("")
     }
 
+		/**
+		  *   pattern: String - the word/pattern to search
+	  	*/
     search(pattern, options, csize=18) {
       if (!pattern)
         throw "empty search pattern"
@@ -15098,7 +15096,6 @@ const Search = module.exports = (() => {
         throw "not an editable text"
     }
 
-
     replace(match, newstr) {
       function split(text, ...pairs) {
         pairs.unshift(0)
@@ -15107,6 +15104,10 @@ const Search = module.exports = (() => {
         return pairs.map(mapper)
       }
 
+			/**
+			 * tochange: the snippet of text that needs to be changed
+			 * affected: Array<Int>
+			 */
       function finalize(self, match, tochange, affected) {
         const removedtext = tochange
           .map(([_, oldtext, __]) => oldtext)
@@ -15116,9 +15117,12 @@ const Search = module.exports = (() => {
           throw `text to replace is different from text found: "${match.text}" vs "${removedtext}"`
 
         tochange.map(([item, _, newtext]) => item.text = newtext)
+
         affected.forEach(i => self.update(i))
 
       }
+
+
 
       function main(self, match, newstr) {
         if (newstr === undefined)
