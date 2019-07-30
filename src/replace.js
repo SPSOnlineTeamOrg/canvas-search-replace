@@ -9,20 +9,16 @@ const Search = module.exports = (() => {
   // largest power of two greater than or equal to x
   const ceillog = x => Math.ceil(Math.log2(x))
 
-  function assert_str_eq() {
-
-  }
-
-
+// NOT SURE WHAT THIS TRULY DOES
   function onespace(s) {
-    while (s.includes("  "))
-      s = s.replace(/  /g, " ")
+//    while (s.includes("  "))
+//      s = s.replace(/  /g, " ")
 
-    while (s.includes("\n "))
-      s = s.replace(/\n /g, "\n")
+  //  while (s.includes("\n "))
+  //    s = s.replace(/\n /g, "\n")
 
-    while (s.includes(" \n"))
-      s = s.replace(/ \n/g, "\n")
+  //  while (s.includes(" \n"))
+  //    s = s.replace(/ \n/g, "\n")
 
     return s
   }
@@ -32,34 +28,33 @@ const Search = module.exports = (() => {
 
     // binary tree stores the length of the text stored in the tree
     heapify() {
-      const size = this.size = 2**ceillog(this.items.length)
-      const heap = this.heap = Array(size<<1 + 1).fill(0)
-      this.items.forEach((s, i) =>
+      const size = this.size = 2**ceillog(this.items.length)    // const ceillog = x => Math.ceil(Math.log2(x))
+
+		  const heap = this.heap = Array(size<<1 + 1).fill(0)
+      this.items.forEach((s, i) =>								   // s is string, i is index?
         heap[i+size] = !s.attr * s.text.length)
       for (let i = size - 1; i >= 0; --i)
         heap[i] = heap[l(i)] + heap[r(i)]
-
     }
 
     constructor(html, ashtml=false) {
-      const match = /(<[\S|\s]*?>)/g
+      const match = /(<[\S|\s]*?>)/g        // matches any HTML tags
       this.raw = html
       this.items = ashtml
         ? html
           .split(match)
-          .map(s => s.trim())
-          .filter(s => s.trim() !== '')
-          .map(s => ({ "attr": /^<[\S|\s]*?>$/g.test(s), "text":s+" " }))
-        : [{ "attr": false, "text":html }]
+				  .map(s=> s)//s.trim())              // I think this was the bug??
+          .filter(s => s.trim() !== '')   // commented out this + broke it
+          .map(s => ({ "attr": /^<[\S|\s]*?>$/g.test(s), "text":s }))    // "text":s+" " }))
+        : [{ "attr": false, "text": html }]
       if (!ashtml)
         this.items.forEach(d =>
-          d.attr ? null : d.text = onespace(d.text+" "))
+          d.attr ? null : d.text = onespace(d.text)) // ORIGINALLY: onespace(d.text+" "))
       this.heapify()
     }
 
     // update the tree to preserve the property
     update(i) {
-
       const heap = this.heap
       this.asserttext(i)
       heap[i+this.size] = this.items[i].text.length
@@ -91,20 +86,26 @@ const Search = module.exports = (() => {
       return ind
     }
 
+		// putting all the text together with no spaces??
     text() {
       return this.items
         .filter(s => !s.attr)
         .map(s => s.text)
         .join("")
-        .trim()
+      //  .trim() //KIM: I COMMENTED THIS OUT
     }
 
     html() {
+			// every item in this.items is  {attr: true/false, text: ".."}
+			// All of the text is trimmed which is the problem.
       return this.items
-        .map(s => s.text.trim())
-        .join("")
+        .map(s => s.text)//.trim()) //KIM: JUST COMMENTED OUT- broke it
+        .join("") // BACK TO ORIGINAL
     }
 
+		/**
+		  *   pattern: String - the word/pattern to search
+	  	*/
     search(pattern, options, csize=18) {
       if (!pattern)
         throw "empty search pattern"
@@ -115,6 +116,13 @@ const Search = module.exports = (() => {
       const regex  = new RegExp(`(${pattern})`, options)
       const strict = new RegExp(`^${pattern}$`, options)
       const text = this.text()
+			// AT THIS POINT, THE WEIRD GLITCH IS ALREADY IN EFFECT IN THE TEXT variable
+			// the text variable is all of the text (including bolded, etc.) together
+			// with normal spaces mostly.
+
+			// example:
+
+			// text = Teaching TeamInstructor:Larry BouthillierTeaching Fellows:Arthur BarrettJazahn ClevengerRobert FrenetteMike HilbornAlain IbrahimMiné SpearsWhy the harmonica image? Learning to code is much like learning to play an instrument. You can often get by by just noodling along and picking up tricks and "licks" here and there. But to really get good, it takes anunderstanding
       return text
         .split(regex)
         .map(str => [str, match, match += str.length])
@@ -143,7 +151,6 @@ const Search = module.exports = (() => {
         throw "not an editable text"
     }
 
-
     replace(match, newstr) {
       function split(text, ...pairs) {
         pairs.unshift(0)
@@ -152,6 +159,10 @@ const Search = module.exports = (() => {
         return pairs.map(mapper)
       }
 
+			/**
+			 * tochange: the snippet of text that needs to be changed
+			 * affected: Array<Int>
+			 */
       function finalize(self, match, tochange, affected) {
         const removedtext = tochange
           .map(([_, oldtext, __]) => oldtext)
@@ -161,9 +172,12 @@ const Search = module.exports = (() => {
           throw `text to replace is different from text found: "${match.text}" vs "${removedtext}"`
 
         tochange.map(([item, _, newtext]) => item.text = newtext)
+
         affected.forEach(i => self.update(i))
 
       }
+
+
 
       function main(self, match, newstr) {
         if (newstr === undefined)
