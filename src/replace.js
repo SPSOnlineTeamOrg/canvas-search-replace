@@ -52,7 +52,7 @@ const Search = module.exports = (() => {
           .map(s => ({ "attr": /^<[\S|\s]*?>$/g.test(s), "text":s+" " }))
         : [{ "attr": false, "text":html }]
       if (!ashtml)
-        this.items.forEach(d => 
+        this.items.forEach(d =>
           d.attr ? null : d.text = onespace(d.text+" "))
       this.heapify()
     }
